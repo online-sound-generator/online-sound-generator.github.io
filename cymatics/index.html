@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cymatic Pattern Generator</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="../online-sound-generator/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../online-sound-generator/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="../online-sound-generator/favicon-16x16.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="panel">
+      <header class="brand">
+        <div class="eyebrow">WEBGL AUDIO PHYSICS LAB</div>
+        <h1>Cymatic Pattern Generator</h1>
+        <p>Cycle-averaged plate modes + moving grains + local grain collisions.</p>
+        <a class="coffee-link" href="https://buymeacoffee.com/creatioexnihilo" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
+      </header>
+
+      <section class="card">
+        <div class="section-head"><h2>Sound source</h2><button class="help-btn" type="button" data-help-section="sound" aria-label="Explain sound source settings">?</button></div>
+        <div class="segmented" role="group" aria-label="Sound source">
+          <button id="modeTone" class="seg active" type="button">Pure tone</button>
+          <button id="modeFile" class="seg" type="button">Audio file</button>
+        </div>
+
+        <div id="toneControls">
+          <label class="row-label" for="toneFreqLog">Simulation frequency <output id="toneFreqOut">345 Hz</output></label>
+          <input id="toneFreqLog" type="range" min="-1" max="5" step="0.001" value="2.537819" />
+          <div class="frequency-entry">
+            <input id="toneFreq" type="number" min="0.1" max="100000" step="any" value="345" inputmode="decimal" aria-label="Simulation frequency in hertz" />
+            <span>Hz</span>
+          </div>
+          <div class="presets" id="freqPresets">
+            <button data-f="0.1">0.1</button><button data-f="1">1</button><button data-f="10">10</button><button data-f="50">50</button>
+            <button data-f="345">345</button><button data-f="1033">1.03k</button><button data-f="3240">3.24k</button><button data-f="5907">5.91k</button>
+            <button data-f="20000">20k</button><button data-f="30000">30k</button><button data-f="50000">50k</button><button data-f="100000">100k</button>
+          </div>
+          <p class="hint">Physics range: 0.1 Hz–100 kHz. Outside a safe audible range, the frequency is simulated but not sent to speakers.</p>
+        </div>
+
+        <div id="fileControls" hidden>
+          <label class="file-drop" for="audioFile">
+            <strong id="fileName">Choose MP3 / WAV / OGG</strong>
+            <span id="fileMeta">Up to five strong FFT peaks excite the plate simultaneously.</span>
+          </label>
+          <input id="audioFile" type="file" accept="audio/*,.wav,.mp3,.ogg" hidden />
+        </div>
+
+        <div class="button-row primary-row">
+          <button id="startBtn" class="primary" type="button">Start</button>
+          <button id="stopBtn" type="button">Stop</button>
+          <button id="resetBtn" type="button">Reset sand</button>
+        </div>
+
+        <label class="row-label" for="volume">Monitor volume <output id="volumeOut">8%</output></label>
+        <input id="volume" type="range" min="0" max="0.3" step="0.005" value="0.08" />
+      </section>
+
+      <section class="card">
+        <div class="section-head"><h2>Plate physics</h2><div class="section-actions"><span id="fpsBadge" class="badge">-- FPS</span><button class="help-btn" type="button" data-help-section="plate" aria-label="Explain plate physics settings">?</button></div></div>
+
+        <label class="row-label" for="boundary">Plate / wall</label>
+        <select id="boundary">
+          <option value="circle" selected>Circular plate</option>
+          <option value="square">Square plate</option>
+        </select>
+
+        <label class="row-label" for="fundamental">Fundamental resonance <output id="fundamentalOut">90 Hz</output></label>
+        <input id="fundamental" type="range" min="20" max="800" step="1" value="90" />
+
+        <label class="row-label" for="quality">Resonance Q <output id="qualityOut">24</output></label>
+        <input id="quality" type="range" min="3" max="80" step="1" value="24" />
+
+        <label class="row-label" for="strength">Vibration force <output id="strengthOut">5.5</output></label>
+        <input id="strength" type="range" min="0" max="12" step="0.1" value="5.5" />
+
+        <label class="row-label" for="sensitivity">Audio sensitivity <output id="sensitivityOut">1.8×</output></label>
+        <input id="sensitivity" type="range" min="0.2" max="4" step="0.1" value="1.8" />
+
+        <div class="source-position">
+          <div class="source-position-head">
+            <span>Sound source position</span>
+            <button id="centerEmitterBtn" class="compact-btn" type="button">Center source</button>
+          </div>
+          <div class="coordinate-grid">
+            <label for="emitterXInput">
+              <span>X</span>
+              <input id="emitterXInput" type="number" min="-0.985" max="0.985" step="0.001" value="0.000" inputmode="decimal" />
+            </label>
+            <label for="emitterYInput">
+              <span>Y</span>
+              <input id="emitterYInput" type="number" min="-0.985" max="0.985" step="0.001" value="0.000" inputmode="decimal" />
+            </label>
+          </div>
+          <p class="hint coordinate-hint">Normalized plate coordinates: center = (0, 0), left/bottom = −1, right/top = +1. Values are constrained to the selected plate wall.</p>
+        </div>
+
+        <p class="hint emitter-hint">Drag the emitter marker on the plate or enter exact coordinates above. A mode is excited according to its amplitude at the emitter position.</p>
+
+        <div class="source-motion">
+          <div class="source-position-head">
+            <span>Source motion</span>
+            <button id="restartMotionBtn" class="compact-btn" type="button">Restart path</button>
+          </div>
+          <label class="row-label" for="motionType">Motion equation</label>
+          <select id="motionType">
+            <option value="manual" selected>Manual / fixed</option>
+            <option value="circle">Circle / ellipse</option>
+            <option value="line">Line oscillation</option>
+            <option value="sine">Sine-wave sweep</option>
+            <option value="figure8">Figure eight</option>
+            <option value="lissajous">Lissajous</option>
+          </select>
+
+          <div id="motionControls" hidden>
+            <div class="coordinate-grid motion-grid">
+              <label for="motionCenterX"><span>Center X</span><input id="motionCenterX" type="number" min="-0.985" max="0.985" step="0.001" value="0.000" /></label>
+              <label for="motionCenterY"><span>Center Y</span><input id="motionCenterY" type="number" min="-0.985" max="0.985" step="0.001" value="0.000" /></label>
+              <label for="motionAmpX"><span>Size X</span><input id="motionAmpX" type="number" min="0" max="1.95" step="0.001" value="0.500" /></label>
+              <label for="motionAmpY"><span>Size Y</span><input id="motionAmpY" type="number" min="0" max="1.95" step="0.001" value="0.500" /></label>
+            </div>
+
+            <label class="row-label" for="motionRate">Path rate <output id="motionRateOut">0.10 Hz</output></label>
+            <input id="motionRate" type="range" min="0.005" max="2" step="0.005" value="0.10" />
+
+            <label class="row-label" for="motionPhase">Phase <output id="motionPhaseOut">0°</output></label>
+            <input id="motionPhase" type="range" min="0" max="360" step="1" value="0" />
+
+            <div id="lineOptions" hidden>
+              <label class="row-label" for="lineAngle">Line angle <output id="lineAngleOut">0°</output></label>
+              <input id="lineAngle" type="range" min="0" max="360" step="1" value="0" />
+            </div>
+
+            <div id="sineOptions" hidden>
+              <label class="row-label" for="sineCycles">Sine cycles across path <output id="sineCyclesOut">2.0</output></label>
+              <input id="sineCycles" type="range" min="0.5" max="8" step="0.5" value="2" />
+            </div>
+
+            <div id="lissajousOptions" hidden>
+              <div class="coordinate-grid motion-grid">
+                <label for="lissajousA"><span>X multiplier</span><input id="lissajousA" type="number" min="1" max="12" step="1" value="3" /></label>
+                <label for="lissajousB"><span>Y multiplier</span><input id="lissajousB" type="number" min="1" max="12" step="1" value="2" /></label>
+              </div>
+            </div>
+
+            <div class="button-row motion-buttons">
+              <button id="motionCenterFromCurrentBtn" type="button">Use current as path center</button>
+            </div>
+            <div id="motionFormula" class="formula-box" aria-live="polite"></div>
+            <p class="hint">The equation advances only while the simulation is running. If a path crosses the physical wall, the source is constrained to the selected plate boundary.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head"><h2>Granular physics</h2><button class="help-btn" type="button" data-help-section="granular" aria-label="Explain granular physics settings">?</button></div>
+
+        <label class="row-label" for="particleCount">Sand grains <output id="particleCountOut">25,000</output></label>
+        <input id="particleCount" type="range" min="5000" max="50000" step="1000" value="25000" />
+
+        <label class="row-label" for="mobility">Mobility <output id="mobilityOut">1.00×</output></label>
+        <input id="mobility" type="range" min="0.2" max="3" step="0.05" value="1" />
+
+        <label class="row-label" for="friction">Surface friction <output id="frictionOut">3.0</output></label>
+        <input id="friction" type="range" min="0.5" max="9" step="0.1" value="3" />
+
+        <label class="row-label" for="collisions">Grain collisions <output id="collisionsOut">1.00×</output></label>
+        <input id="collisions" type="range" min="0" max="2.5" step="0.05" value="1" />
+
+        <label class="row-label" for="restitution">Wall restitution <output id="restitutionOut">0.18</output></label>
+        <input id="restitution" type="range" min="0" max="0.8" step="0.02" value="0.18" />
+      </section>
+
+      <section class="card">
+        <div class="section-head"><h2>Appearance</h2><button class="help-btn" type="button" data-help-section="appearance" aria-label="Explain appearance settings">?</button></div>
+        <div class="color-grid">
+          <label>Background <input id="bgColor" type="color" value="#07090b" /></label>
+          <label>Sand <input id="sandColor" type="color" value="#ead7a5" /></label>
+        </div>
+        <label class="row-label" for="grainSize">Grain size <output id="grainSizeOut">1.35 px</output></label>
+        <input id="grainSize" type="range" min="0.5" max="3.5" step="0.05" value="1.35" />
+        <label class="check"><input id="showGuide" type="checkbox" /> Show modal-energy guide (debug)</label>
+        <label class="check"><input id="showEmitter" type="checkbox" checked /> Show emitter</label>
+      </section>
+
+      <section class="card">
+        <div class="section-head"><h2>Share / reproduce</h2><button class="help-btn" type="button" data-help-section="share" aria-label="Explain share and reproduce options">?</button></div>
+        <div class="button-row share-row">
+          <button id="exportConfigBtn" type="button">Export config</button>
+          <button id="exportSnapshotBtn" type="button">Export snapshot</button>
+          <label class="button-like" for="importPatternFile">Import</label>
+          <input id="importPatternFile" type="file" accept="application/json,.json,.cymatics.json" hidden />
+        </div>
+        <p class="hint">Config stores the experimental conditions. Snapshot also stores every grain's current position and velocity, so another person can open the exact visible pattern.</p>
+        <p id="shareStatus" class="share-status" aria-live="polite"></p>
+      </section>
+
+      <section class="card">
+        <div class="section-head"><h2>Capture</h2><button class="help-btn" type="button" data-help-section="capture" aria-label="Explain capture options">?</button></div>
+        <div class="button-row">
+          <button id="shotBtn" type="button">PNG image</button>
+          <button id="recordBtn" type="button">Record video</button>
+        </div>
+        <p class="hint">Video uses MP4 when supported by the browser, otherwise WebM.</p>
+      </section>
+    </aside>
+
+    <main class="workspace">
+      <div class="hud" aria-label="Simulation telemetry">
+        <div><span>drive</span><strong id="driveHud">0.00</strong></div>
+        <div><span>frequency</span><strong id="freqHud">345 Hz</strong></div>
+        <div><span>dominant mode</span><strong id="modeHud">—</strong></div>
+        <div><span>mean grain speed</span><strong id="speedHud">0.0000</strong></div>
+        <div><span>active modes</span><strong id="activeHud">0</strong></div>
+        <div><span>collisions / s</span><strong id="collisionHud">0</strong></div>
+      </div>
+      <div class="stage" id="stage">
+        <canvas id="glCanvas"></canvas>
+        <canvas id="guideCanvas"></canvas>
+      </div>
+      <div id="message" class="status-bar" aria-live="polite">Drag the emitter, then press Start.</div>
+    </main>
+  </div>
+
+
+  <div id="helpModal" class="help-modal" hidden>
+    <div class="help-backdrop" data-close-help></div>
+    <section class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="help-dialog-head">
+        <div>
+          <div class="eyebrow">CONFIGURATION REFERENCE</div>
+          <h2 id="helpTitle">Settings help</h2>
+        </div>
+        <button id="closeHelpBtn" class="help-close" type="button" aria-label="Close help">×</button>
+      </div>
+      <div id="helpBody" class="help-body"></div>
+    </section>
+  </div>
+
+  <audio id="audioEl" preload="auto"></audio>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,505 @@
+Build a static web application (HTML, CSS, Vanilla JavaScript only — no backend) that functions as an interactive music theory visualizer based on a circular chromatic note layout.
+
+The application must be modular, readable, and production-ready. No frameworks unless absolutely necessary. SVG should be used for graphics rendering.
+
+1. Core Concept: Circular Chromatic Layout
+
+Create a circle that represents the 12 semitones arranged like a clock:
+
+Index mapping (clockwise):
+
+0 → C (12 o'clock)
+1 → C#
+2 → D
+3 → D#
+4 → E
+5 → F
+6 → F#
+7 → G
+8 → G#
+9 → A
+10 → A#
+11 → B
+
+Requirements:
+
+Render circle using SVG.
+
+Evenly space 12 labeled nodes.
+
+Nodes must be clickable.
+
+Selected note becomes the “Tonic” (base note).
+
+Rotating the tonic should behave as a geometric rotation (do NOT re-render positions — just change interval calculations).
+
+2. Interval System (Half-Step Based Engine)
+
+All calculations must be based on semitone distance (H = half step).
+
+Base Interval Mapping
+
+m2 = 1H
+M2 = 2H
+m3 = 3H
+M3 = 4H
+P4 = 5H
+P5 = 7H
+m6 = 8H
+M6 = 9H
+m7 = 10H
+M7 = 11H
+P8 = 12H
+
+Augmented Intervals
+
+Aug = Major or Perfect + 1H
+
+Aug2 = 3H
+Aug3 = 5H
+Aug4 = 6H
+Aug5 = 8H
+Aug6 = 10H
+Aug7 = 12H
+Aug8 = 13H
+
+Diminished Intervals
+
+Dim = Minor or Perfect − 1H
+
+Dim2 = 0H
+Dim3 = 2H
+Dim4 = 4H
+Dim5 = 6H
+Dim6 = 7H
+Dim7 = 9H
+Dim8 = 11H
+
+3. Functional Harmony Lines (Toggleable)
+
+Draw colored SVG lines between tonic and related scale degrees.
+
+Each relationship must be toggleable via UI controls (checkbox panel).
+
+Dominant (D) → 7H
+Subdominant (SD) → 5H
+Mediant (M) → 4H
+Submediant (SM) → 9H
+Supertonic (ST) → 2H
+
+Major-only:
+Leading Tone (LT) → 11H
+
+Minor-only:
+Subtonic → 10H
+
+Tonic (T) → 12H (octave)
+
+Each relationship must:
+
+Have unique color
+
+Be toggleable
+
+Update dynamically when tonic changes
+
+4. Scale Generator
+
+Implement:
+
+Major Scale pattern:
+W W H W W W H
+(2 2 1 2 2 2 1 in semitones)
+
+Minor Scale pattern:
+W H W W H W W
+(2 1 2 2 1 2 2)
+
+When a tonic is selected:
+
+Highlight notes belonging to selected scale
+
+Draw connections between scale degrees
+
+Allow switching between Major and Minor
+
+5. Interval Visualization Mode
+
+Add a UI panel that allows:
+
+Selecting any two notes
+
+Displaying:
+
+Semitone distance
+
+Interval name
+
+Inversion
+
+Interval inversion rule:
+Inversion = 12H − original interval
+
+Example:
+C → G = 7H (P5)
+G → C (next octave) = 5H (P4)
+
+Show both original and inverted interval.
+
+6. Triads and Chords
+
+Implement chord construction from tonic:
+
+Major Triad = 0, 4, 7
+Minor Triad = 0, 3, 7
+Diminished Triad = 0, 3, 6
+Augmented Triad = 0, 4, 8
+
+Display:
+
+Highlighted chord notes
+
+Lines forming a triangle
+
+Chord name label
+
+Allow:
+
+Locking chord structure
+
+Sliding tonic (rotational transformation)
+
+Chord updates automatically
+
+7. Emotional Harmony Assistant
+
+Add a section that suggests chord progressions and emotional qualities.
+
+Examples:
+
+Major Progressions:
+I – IV – V → stable, resolved
+I – V – vi – IV → emotional / pop
+ii – V – I → jazzy resolution
+
+Minor Progressions:
+i – iv – v → dark, modal
+i – VI – III – VII → cinematic
+i – iv – VII → melancholic
+
+When tonic changes:
+
+Progressions update automatically
+
+8. UI Requirements
+
+Clean dark theme
+
+Responsive layout
+
+Side control panel:
+
+Scale selector (Major/Minor)
+
+Toggle harmony lines
+
+Interval calculator
+
+Chord selector
+
+Smooth animations for line drawing
+
+Hover tooltips explaining interval math
+
+9. Architecture Requirements
+
+Separate modules:
+
+circleRenderer.js
+
+intervalEngine.js
+
+harmonyEngine.js
+
+scaleEngine.js
+
+chordEngine.js
+
+No global variables
+
+Pure functions for interval math
+
+Clear comments
+
+Maintainable code
+
+10. Bonus Features (Optional but Preferred)
+
+MIDI playback (Web Audio API)
+
+Click note to hear pitch
+
+Export selected chord progression as text
+
+Animated rotation mode
+
+The result should be a single static project folder ready to open in a browser (no build tools required).
+
+Focus on mathematical correctness and clear music theory logic.
+
+Do not simplify the interval math. Use semitone-based computation internally.
+
+
+##################
+I. Diatonic (7-Note) Scales
+Major System
+
+Major (Ionian)
+
+Natural Minor (Aeolian)
+
+Harmonic Minor
+
+Melodic Minor (ascending form)
+
+Harmonic Major
+
+Melodic Major (jazz minor modes)
+
+The 7 Modes of the Major Scale
+
+Ionian
+
+Dorian
+
+Phrygian
+
+Lydian
+
+Mixolydian
+
+Aeolian
+
+Locrian
+
+Modes of Harmonic Minor
+
+Harmonic Minor
+
+Locrian ♮6
+
+Ionian ♯5
+
+Dorian ♯4
+
+Phrygian Dominant
+
+Lydian ♯2
+
+Ultra-Locrian (Super-Locrian ♭♭7)
+
+Modes of Melodic Minor (Jazz Minor)
+
+Melodic Minor
+
+Dorian ♭2
+
+Lydian Augmented
+
+Lydian Dominant (Acoustic Scale)
+
+Mixolydian ♭6
+
+Locrian ♮2
+
+Altered Scale (Super-Locrian)
+
+II. Pentatonic Scales (5-Note)
+
+Major Pentatonic
+
+Minor Pentatonic
+
+Blues Pentatonic
+
+Egyptian Pentatonic
+
+Man Gong
+
+Ritusen
+
+Insen
+
+Hirajoshi
+
+Kumoi
+
+Yo scale
+
+III. Hexatonic (6-Note)
+
+Whole Tone
+
+Augmented Scale
+
+Blues Scale
+
+Prometheus
+
+Tritone Scale
+
+IV. Octatonic (8-Note)
+
+Diminished (Whole–Half)
+
+Diminished (Half–Whole)
+
+Bebop Major
+
+Bebop Dominant
+
+Bebop Minor
+
+Bebop Melodic Minor
+
+V. Symmetrical Scales
+
+Chromatic (12 notes)
+
+Whole Tone
+
+Diminished
+
+Augmented
+
+VI. Synthetic / Modern Scales
+
+Neapolitan Major
+
+Neapolitan Minor
+
+Enigmatic Scale
+
+Double Harmonic Major (Byzantine)
+
+Hungarian Minor
+
+Hungarian Major
+
+Persian
+
+Arabic
+
+Spanish Gypsy (Phrygian Dominant)
+
+Romanian Minor
+
+Balinese Pelog
+
+Ukrainian Dorian
+
+Leading Whole Tone
+
+Lydian ♭7
+
+Acoustic
+
+Altered Dominant
+
+Half Diminished
+
+Major Locrian
+
+Overtone Scale
+
+VII. Modal Folk / Regional Scales
+Middle Eastern / Arabic Maqam Families
+
+Rast
+
+Bayati
+
+Hijaz
+
+Saba
+
+Kurd
+
+Nahawand
+
+Ajam
+
+Sikah
+
+Indian (Raga Parent Scales – Thaat System)
+
+Bilawal
+
+Kalyan
+
+Khamaj
+
+Bhairav
+
+Poorvi
+
+Marwa
+
+Kafi
+
+Asavari
+
+Todi
+
+Bhairavi
+
+Japanese
+
+In
+
+Yo
+
+Hirajoshi
+
+Kumoi
+
+Iwato
+
+Chinese
+
+Gong
+
+Shang
+
+Jue
+
+Zhi
+
+Yu
+
+VIII. Microtonal & Non-Western Systems
+
+19-tone equal temperament scales
+
+24-tone quarter-tone scales
+
+Maqam microtonal variants
+
+Turkish Makam
+
+Persian Dastgah
+
+Indonesian Slendro
+
+Indonesian Pelog
+
+IX. Special Theoretical Constructs
+
+Chromatic
+
+Synthetic symmetric divisions of octave
+
+Messiaen Modes of Limited Transposition (Modes 1–7)
+
+Artificial scales (any custom interval set)
+

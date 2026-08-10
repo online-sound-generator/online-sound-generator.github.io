@@ -1,0 +1,65 @@
+I need a web project (static site) that helps me make music
+
+The main idea is that i position the notes: C, C, D, D#, E, F, F#, G, G#, A, A#, B
+in a circle
+
+I will have a circle and some points like the point where are the hours in a clock so 
+C will be put where the 12 hour is on an analog clock
+C# will be 1
+D will be 2
+D# will be 3 and so on until B will be 11
+
+
+We have the idea of whole step (W) and half step (H)
+
+Major scale: W W H W W W H
+Minor scale: W H W W H W W
+
+I will have lines in different colors to connect
+Dominant (D) where it has 7H (example: line between C-G)
+Subdominant (SD) where it has 5H
+Mediant (M) -> 4H
+Submediant (SM) -> 9H
+SuperTonic (ST) -> 1H
+
+Leading Tone for major scales (LT) it has 1H diff
+Subtonic for minor scales (ST) it has 2H diff
+
+Tonic (T) is like the same note one octave higher like C4-C5
+
+Those lines can be toggled on/off
+
+Also we will have intervals
+
+We will also have a way to represent the specific intervals
+Major(M), Minor (m), Perfect (P) => (m2 = 1H, M2 = 2H, m3 = 3H, M3 = 4H, P4 = 5H, P5 = 7H, m6 = 8H, M6 = 9H, m7 = 10H, M7 = 11H, P8 = 12H)
+
+We also have augumented intervals
+M, P + 1H => Aug
+
+Aug2 = 3H, Aug3 = 5H, Aug4 = 6H, Aug5 = 8H, Aug6 = 10H, Aug7 = 12H, Aug8 = 13H
+
+We also have diminished intervals
+m, P - 1H => Dim
+
+Dim2 = 0H, Dim3 = 2H, Dim4 = 4H, Dim5 = 6H, Dim6 = 7H, Dim7 = 9H, Dim8 = 11H
+
+We also have the notion of interval inversion 
+here you take the base note and put it 1 octave (12H) higher 
+
+
+example: C4-G4 (P5[7H]) => G4-C5 (P4[5H])
+
+We also have the notion of triads and chords
+
+
+We will have a way to visualize the relationship between those in a graphic way on the circle using colored lines 
+Those lines can be locked in and ican slide the base note to be anywhere and the relationship will change ...it is like a rotation if we speak geometricaly
+
+
+I want also a way to know which notes/chords work together and how should they be aranged to transmit different emotions
+
+
+
+
+

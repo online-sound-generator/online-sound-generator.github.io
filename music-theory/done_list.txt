@@ -1,0 +1,62 @@
+2026-02-21 Progress Log
+
+[x] Read and interpreted `plan.txt` requirements (static SVG app, semitone engine, modular architecture).
+[x] Built complete app layout in `index.html` with required control sections.
+[x] Implemented responsive dark theme and SVG/node/line styling in `style.css`.
+[x] Created interval engine (`intervalEngine.js`) with semitone mapping, interval naming, and inversion logic.
+[x] Created scale engine (`scaleEngine.js`) for major/minor generation and scale connections.
+[x] Created harmony engine (`harmonyEngine.js`) for functional harmony toggles and progression suggestions.
+[x] Created chord engine (`chordEngine.js`) for triad construction and chord connections.
+[x] Created SVG renderer (`circleRenderer.js`) with clickable note nodes, animated lines, and hover tooltips.
+[x] Wired full app state and UI interactions in `index.js` (tonic updates, mode switching, interval view, chord lock, progression export, optional audio).
+[x] Final validation pass completed:
+    - ESM syntax checks passed for all JS modules with `node --check --experimental-default-type=module`.
+[x] Fixed `file://` CORS/module loading issue:
+    - Removed `type="module"` usage.
+    - Converted all JS files to browser-global modules (`window.*`) with ordered `<script defer ...>` loading.
+[x] Applied friendlier light-theme redesign in `style.css` (backgrounds, cards, controls, SVG area, node colors).
+[x] Revalidated syntax after conversion using `node --check` on all JS files.
+[x] Fixed SVG line rendering crash (`InvalidStateError` in `getTotalLength`):
+    - Append line/circle to SVG group before animation setup.
+    - Guard `getTotalLength` with `requestAnimationFrame` + `try/catch`.
+    - Preserve line visibility even if animation length cannot be computed.
+[x] Added explicit line-layer visibility controls:
+    - Scale connections toggle.
+    - Harmony master visibility toggle (plus per-relationship toggles).
+    - Interval line toggle.
+    - Chord triangle toggle.
+[x] Added audio playback modes:
+    - `Single note`
+    - `Chord together` (simultaneous chord playback)
+    - `Chord one after another` (arpeggiated chord playback)
+    - Stops active voices cleanly when playback is disabled or retriggered.
+[x] Fixed octave handling for chord playback:
+    - Chord tones now use absolute semitone offsets from C4.
+    - Wrapped tones (example F major: C) are played in the next octave (C5), not folded down.
+[x] Expanded chord system beyond triads:
+    - Added 4-note and 5-note chord types (7th, 9th, 6th, suspended, half-diminished, etc.).
+    - Updated chord drawing to support N-note polygons/paths, not only triangles.
+    - Updated chord status label to include octave-aware note labels.
+[x] Expanded harmony assistant suggestions:
+    - Added additional major/minor progressions, including 7th-chord progressions.
+    - Added generated chord-name progression display (`Chords: ...`) in assistant cards.
+[x] Added large scale library from plan categories:
+    - Diatonic families and modal systems (major, harmonic minor modes, melodic minor modes).
+    - Pentatonic, hexatonic, octatonic, symmetrical, and synthetic/modern scales.
+    - Regional/modal families (maqam, thaat, Japanese, Chinese).
+    - Microtonal/non-western entries included as 12-TET approximations with notes.
+    - Messiaen modes 1-7 and custom artificial interval-set scale.
+[x] Reworked scale UI:
+    - Dynamic grouped `Scale Preset` selector.
+    - Scale metadata/details panel.
+    - Custom interval input for artificial scales (`0-11` semitone classes).
+[x] Added Strudel-style chord system:
+    - Implemented full requested chord token set as transposable chord qualities.
+    - Dynamic chord selector populated from chord engine (not hardcoded HTML).
+    - Multi-note chord geometry and playback remain octave-aware.
+[x] Added emotion-targeted guidance:
+    - New `Emotion Target` selector.
+    - Direct emotion chord recommendations (roman + chord spellings).
+    - Progressions now filter by emotion tags when matches exist.
+[x] Validation:
+    - `node --check` passed for `intervalEngine.js`, `scaleEngine.js`, `harmonyEngine.js`, `chordEngine.js`, `circleRenderer.js`, and `index.js`.

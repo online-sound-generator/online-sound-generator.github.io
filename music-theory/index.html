@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chromatic Circle Music Theory Visualizer</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="../online-sound-generator/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../online-sound-generator/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../online-sound-generator/favicon-16x16.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="visualizer-panel">
+      <header class="panel-header">
+        <h1>Chromatic Circle</h1>
+        <p>Interactive semitone-based music theory visualizer</p>
+      </header>
+      <div class="svg-wrap" id="svgWrap">
+        <svg id="circleSvg" viewBox="0 0 600 600" role="img" aria-label="Chromatic note circle"></svg>
+        <div id="noteTooltip" class="note-tooltip" aria-live="polite"></div>
+      </div>
+      <div class="status-strip">
+        <span id="tonicLabel">Tonic: C</span>
+        <span id="scaleLabel">Mode: Major</span>
+        <span id="chordLabel">Chord: C</span>
+      </div>
+    </section>
+
+    <aside class="control-panel">
+      <section class="card">
+        <h2>Scale</h2>
+        <label for="scalePreset">Scale Preset</label>
+        <select id="scalePreset"></select>
+        <p class="card-hint" id="scaleMeta"></p>
+        <div id="scaleCustomWrap" class="hidden-wrap">
+          <label for="scaleCustomIntervals">Custom semitones (0-11)</label>
+          <input
+            id="scaleCustomIntervals"
+            type="text"
+            value="0,2,4,5,7,9,11"
+            placeholder="Example: 0,1,4,6,7,10"
+          >
+        </div>
+        <label class="inline-toggle">
+          <input type="checkbox" id="showScaleLines" checked>
+          Show scale connections
+        </label>
+      </section>
+
+      <section class="card">
+        <h2>Harmony Lines</h2>
+        <p class="card-hint">Toggle relationships from tonic by semitone distance.</p>
+        <label class="inline-toggle">
+          <input type="checkbox" id="showHarmonyLines" checked>
+          Show harmony lines
+        </label>
+        <div id="harmonyToggleList" class="toggle-list"></div>
+      </section>
+
+      <section class="card">
+        <h2>Interval Visualizer</h2>
+        <div class="field-grid">
+          <label for="intervalFrom">From</label>
+          <select id="intervalFrom"></select>
+          <label for="intervalTo">To</label>
+          <select id="intervalTo"></select>
+        </div>
+        <label class="inline-toggle">
+          <input type="checkbox" id="showIntervalLine" checked>
+          Show interval line
+        </label>
+        <div class="result-box" id="intervalResult"></div>
+      </section>
+
+      <section class="card">
+        <h2>Triads & Chords</h2>
+        <div class="field-grid">
+          <label for="chordType">Chord Type</label>
+          <select id="chordType"></select>
+        </div>
+        <label class="inline-toggle">
+          <input type="checkbox" id="lockChordToTonic" checked>
+          Lock chord structure to tonic
+        </label>
+        <label for="chordRoot">Chord Root (when unlocked)</label>
+        <select id="chordRoot"></select>
+        <label class="inline-toggle">
+          <input type="checkbox" id="showChordLines" checked>
+          Show chord shape
+        </label>
+      </section>
+
+      <section class="card">
+        <h2>Emotional Harmony Assistant</h2>
+        <p class="card-hint">Mode-aware progression ideas with note spellings.</p>
+        <label for="emotionTarget">Emotion Target</label>
+        <select id="emotionTarget"></select>
+        <div id="emotionChordList" class="progression-list"></div>
+        <div id="progressionList" class="progression-list"></div>
+        <button id="exportProgressions" type="button">Export Progressions</button>
+      </section>
+
+      <section class="card">
+        <h2>Audio</h2>
+        <label class="inline-toggle">
+          <input type="checkbox" id="audioEnabled" checked>
+          Play note when selecting tonic
+        </label>
+        <label for="audioPlaybackMode">Playback Mode</label>
+        <select id="audioPlaybackMode">
+          <option value="single">Single note</option>
+          <option value="together">Chord together</option>
+          <option value="sequence">Chord one after another</option>
+        </select>
+      </section>
+    </aside>
+  </main>
+
+  <script defer src="intervalEngine.js"></script>
+  <script defer src="scaleEngine.js"></script>
+  <script defer src="harmonyEngine.js"></script>
+  <script defer src="chordEngine.js"></script>
+  <script defer src="circleRenderer.js"></script>
+  <script defer src="index.js"></script>
+</body>
+</html>
