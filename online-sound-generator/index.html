@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.jsdelivr.net/npm/soundfont-player/dist/soundfont-player.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
+	
+	  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+	  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+	  <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+
+
+    <title>Polyphonic Tune Generator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background: #ffffff;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .textarea-container {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            resize: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .scroll-container {
+            overflow-y: auto;
+            max-height: calc(100vh - 150px);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 20px;
+            }
+
+            textarea {
+                height: 60px;
+            }
+
+            button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            select {
+                font-size: 12px;
+            }
+        }
+		
+		
+	.buy-coffee-button {
+		background-color: #ff813f;
+		color: #fff;
+		padding: 15px 30px;
+		font-size: 1rem;
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: background-color 0.3s;
+		width: 100%;
+		max-width: 200px;
+		text-align: center;
+	}
+
+	.buy-coffee-button:hover {
+		background-color: #e76b2f;
+	}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Polyphonic Tune Generator</h1>
+        <div>
+            <!-- Input Areas -->
+	<div class="textarea-container">
+		<textarea id="tune-input-1" placeholder="C4:1, D4:0.5, REST:1"></textarea>
+		<label for="sound-type-1">Select Sound:</label>
+		<select id="sound-type-1">
+			<optgroup label="Oscillator Waveforms">
+				<option value="sine">Sine</option>
+				<option value="square">Square</option>
+				<option value="triangle">Triangle</option>
+				<option value="sawtooth">Sawtooth</option>
+			</optgroup>
+			<optgroup label="Keyboards">
+				<option value="acoustic_grand_piano">Acoustic Grand Piano</option>
+				<option value="electric_piano_1">Electric Piano 1</option>
+				<option value="electric_piano_2">Electric Piano 2</option>
+				<option value="harpsichord">Harpsichord</option>
+				<option value="accordion">Accordion</option>
+			</optgroup>
+			<optgroup label="Guitars">
+				<option value="electric_guitar_clean">Electric Guitar (Clean)</option>
+				<option value="electric_guitar_jazz">Electric Guitar (Jazz)</option>
+				<option value="distortion_guitar">Distortion Guitar</option>
+				<option value="acoustic_guitar_steel">Acoustic Guitar (Steel)</option>
+				<option value="acoustic_guitar_nylon">Acoustic Guitar (Nylon)</option>
+			</optgroup>
+			<optgroup label="Strings">
+				<option value="violin">Violin</option>
+				<option value="cello">Cello</option>
+				<option value="contrabass">Contrabass</option>
+				<option value="tremolo_strings">Tremolo Strings</option>
+				<option value="orchestral_harp">Orchestral Harp</option>
+			</optgroup>
+			<optgroup label="Winds">
+				<option value="flute">Flute</option>
+				<option value="oboe">Oboe</option>
+				<option value="clarinet">Clarinet</option>
+				<option value="bassoon">Bassoon</option>
+				<option value="piccolo">Piccolo</option>
+				<option value="english_horn">English Horn</option>
+			</optgroup>
+			<optgroup label="Brass">
+				<option value="trumpet">Trumpet</option>
+				<option value="trombone">Trombone</option>
+				<option value="french_horn">French Horn</option>
+				<option value="tuba">Tuba</option>
+				<option value="muted_trumpet">Muted Trumpet</option>
+			</optgroup>
+			<optgroup label="Percussion">
+				<option value="timpani">Timpani</option>
+				<option value="xylophone">Xylophone</option>
+				<option value="steel_drums">Steel Drums</option>
+				<option value="synth_drum">Synth Drum</option>
+				<option value="marimba">Marimba</option>
+				<option value="glockenspiel">Glockenspiel</option>
+			</optgroup>
+			<optgroup label="Synthesizers">
+				<option value="synth_brass_1">Synth Brass 1</option>
+				<option value="synth_strings_1">Synth Strings 1</option>
+				<option value="lead_1_square">Lead 1 (Square)</option>
+				<option value="lead_2_sawtooth">Lead 2 (Sawtooth)</option>
+				<option value="pad_1_new_age">Pad 1 (New Age)</option>
+				<option value="pad_4_choir">Pad 4 (Choir)</option>
+			</optgroup>
+			<optgroup label="Chorus & Effects">
+				<option value="voice_oohs">Voice Oohs</option>
+				<option value="choir_aahs">Choir Aahs</option>
+				<option value="fx_1_rain">FX 1 (Rain)</option>
+				<option value="fx_2_soundtrack">FX 2 (Soundtrack)</option>
+				<option value="fx_5_brightness">FX 5 (Brightness)</option>
+				<option value="fx_7_echoes">FX 7 (Echoes)</option>
+			</optgroup>
+			<optgroup label="Ethnic">
+				<option value="sitar">Sitar</option>
+				<option value="banjo">Banjo</option>
+				<option value="shakuhachi">Shakuhachi</option>
+				<option value="bagpipe">Bagpipe</option>
+				<option value="koto">Koto</option>
+				<option value="kalimba">Kalimba</option>
+			</optgroup>
+		</select>
+
+		<button onclick="playTune(1)">Play Tune 1</button>
+	</div>
+
+        <div class="textarea-container">
+			<textarea id="tune-input-2" placeholder="C4:1, D4:0.5, REST:1"></textarea>
+			<label for="sound-type-2">Select Sound:</label>
+			<select id="sound-type-2">
+				<optgroup label="Oscillator Waveforms">
+					<option value="sine">Sine</option>
+					<option value="square">Square</option>
+					<option value="triangle">Triangle</option>
+					<option value="sawtooth">Sawtooth</option>
+				</optgroup>
+				<optgroup label="Keyboards">
+					<option value="acoustic_grand_piano">Acoustic Grand Piano</option>
+					<option value="electric_piano_1">Electric Piano 1</option>
+					<option value="electric_piano_2">Electric Piano 2</option>
+					<option value="harpsichord">Harpsichord</option>
+					<option value="accordion">Accordion</option>
+				</optgroup>
+				<optgroup label="Guitars">
+					<option value="electric_guitar_clean">Electric Guitar (Clean)</option>
+					<option value="electric_guitar_jazz">Electric Guitar (Jazz)</option>
+					<option value="distortion_guitar">Distortion Guitar</option>
+					<option value="acoustic_guitar_steel">Acoustic Guitar (Steel)</option>
+					<option value="acoustic_guitar_nylon">Acoustic Guitar (Nylon)</option>
+				</optgroup>
+				<optgroup label="Strings">
+					<option value="violin">Violin</option>
+					<option value="cello">Cello</option>
+					<option value="contrabass">Contrabass</option>
+					<option value="tremolo_strings">Tremolo Strings</option>
+					<option value="orchestral_harp">Orchestral Harp</option>
+				</optgroup>
+				<optgroup label="Winds">
+					<option value="flute">Flute</option>
+					<option value="oboe">Oboe</option>
+					<option value="clarinet">Clarinet</option>
+					<option value="bassoon">Bassoon</option>
+					<option value="piccolo">Piccolo</option>
+					<option value="english_horn">English Horn</option>
+				</optgroup>
+				<optgroup label="Brass">
+					<option value="trumpet">Trumpet</option>
+					<option value="trombone">Trombone</option>
+					<option value="french_horn">French Horn</option>
+					<option value="tuba">Tuba</option>
+					<option value="muted_trumpet">Muted Trumpet</option>
+				</optgroup>
+				<optgroup label="Percussion">
+					<option value="timpani">Timpani</option>
+					<option value="xylophone">Xylophone</option>
+					<option value="steel_drums">Steel Drums</option>
+					<option value="synth_drum">Synth Drum</option>
+					<option value="marimba">Marimba</option>
+					<option value="glockenspiel">Glockenspiel</option>
+				</optgroup>
+				<optgroup label="Synthesizers">
+					<option value="synth_brass_1">Synth Brass 1</option>
+					<option value="synth_strings_1">Synth Strings 1</option>
+					<option value="lead_1_square">Lead 1 (Square)</option>
+					<option value="lead_2_sawtooth">Lead 2 (Sawtooth)</option>
+					<option value="pad_1_new_age">Pad 1 (New Age)</option>
+					<option value="pad_4_choir">Pad 4 (Choir)</option>
+				</optgroup>
+				<optgroup label="Chorus & Effects">
+					<option value="voice_oohs">Voice Oohs</option>
+					<option value="choir_aahs">Choir Aahs</option>
+					<option value="fx_1_rain">FX 1 (Rain)</option>
+					<option value="fx_2_soundtrack">FX 2 (Soundtrack)</option>
+					<option value="fx_5_brightness">FX 5 (Brightness)</option>
+					<option value="fx_7_echoes">FX 7 (Echoes)</option>
+				</optgroup>
+				<optgroup label="Ethnic">
+					<option value="sitar">Sitar</option>
+					<option value="banjo">Banjo</option>
+					<option value="shakuhachi">Shakuhachi</option>
+					<option value="bagpipe">Bagpipe</option>
+					<option value="koto">Koto</option>
+					<option value="kalimba">Kalimba</option>
+				</optgroup>
+			</select>
+
+			<button onclick="playTune(2)">Play Tune 2</button>
+		</div>
+
+        <div class="textarea-container">
+			<textarea id="tune-input-3" placeholder="C4:1, D4:0.5, REST:1"></textarea>
+			<label for="sound-type-3">Select Sound:</label>
+			<select id="sound-type-3">
+				<optgroup label="Oscillator Waveforms">
+					<option value="sine">Sine</option>
+					<option value="square">Square</option>
+					<option value="triangle">Triangle</option>
+					<option value="sawtooth">Sawtooth</option>
+				</optgroup>
+				<optgroup label="Keyboards">
+					<option value="acoustic_grand_piano">Acoustic Grand Piano</option>
+					<option value="electric_piano_1">Electric Piano 1</option>
+					<option value="electric_piano_2">Electric Piano 2</option>
+					<option value="harpsichord">Harpsichord</option>
+					<option value="accordion">Accordion</option>
+				</optgroup>
+				<optgroup label="Guitars">
+					<option value="electric_guitar_clean">Electric Guitar (Clean)</option>
+					<option value="electric_guitar_jazz">Electric Guitar (Jazz)</option>
+					<option value="distortion_guitar">Distortion Guitar</option>
+					<option value="acoustic_guitar_steel">Acoustic Guitar (Steel)</option>
+					<option value="acoustic_guitar_nylon">Acoustic Guitar (Nylon)</option>
+				</optgroup>
+				<optgroup label="Strings">
+					<option value="violin">Violin</option>
+					<option value="cello">Cello</option>
+					<option value="contrabass">Contrabass</option>
+					<option value="tremolo_strings">Tremolo Strings</option>
+					<option value="orchestral_harp">Orchestral Harp</option>
+				</optgroup>
+				<optgroup label="Winds">
+					<option value="flute">Flute</option>
+					<option value="oboe">Oboe</option>
+					<option value="clarinet">Clarinet</option>
+					<option value="bassoon">Bassoon</option>
+					<option value="piccolo">Piccolo</option>
+					<option value="english_horn">English Horn</option>
+				</optgroup>
+				<optgroup label="Brass">
+					<option value="trumpet">Trumpet</option>
+					<option value="trombone">Trombone</option>
+					<option value="french_horn">French Horn</option>
+					<option value="tuba">Tuba</option>
+					<option value="muted_trumpet">Muted Trumpet</option>
+				</optgroup>
+				<optgroup label="Percussion">
+					<option value="timpani">Timpani</option>
+					<option value="xylophone">Xylophone</option>
+					<option value="steel_drums">Steel Drums</option>
+					<option value="synth_drum">Synth Drum</option>
+					<option value="marimba">Marimba</option>
+					<option value="glockenspiel">Glockenspiel</option>
+				</optgroup>
+				<optgroup label="Synthesizers">
+					<option value="synth_brass_1">Synth Brass 1</option>
+					<option value="synth_strings_1">Synth Strings 1</option>
+					<option value="lead_1_square">Lead 1 (Square)</option>
+					<option value="lead_2_sawtooth">Lead 2 (Sawtooth)</option>
+					<option value="pad_1_new_age">Pad 1 (New Age)</option>
+					<option value="pad_4_choir">Pad 4 (Choir)</option>
+				</optgroup>
+				<optgroup label="Chorus & Effects">
+					<option value="voice_oohs">Voice Oohs</option>
+					<option value="choir_aahs">Choir Aahs</option>
+					<option value="fx_1_rain">FX 1 (Rain)</option>
+					<option value="fx_2_soundtrack">FX 2 (Soundtrack)</option>
+					<option value="fx_5_brightness">FX 5 (Brightness)</option>
+					<option value="fx_7_echoes">FX 7 (Echoes)</option>
+				</optgroup>
+				<optgroup label="Ethnic">
+					<option value="sitar">Sitar</option>
+					<option value="banjo">Banjo</option>
+					<option value="shakuhachi">Shakuhachi</option>
+					<option value="bagpipe">Bagpipe</option>
+					<option value="koto">Koto</option>
+					<option value="kalimba">Kalimba</option>
+				</optgroup>
+			</select>
+
+			<button onclick="playTune(3)">Play Tune 3</button>
+		</div>
+		
+		<div class="textarea-container">
+			<textarea id="tune-input-4" placeholder="C4:1, D4:0.5, REST:1"></textarea>
+			<label for="sound-type-4">Select Sound:</label>
+			<select id="sound-type-4">
+				<optgroup label="Oscillator Waveforms">
+					<option value="sine">Sine</option>
+					<option value="square">Square</option>
+					<option value="triangle">Triangle</option>
+					<option value="sawtooth">Sawtooth</option>
+				</optgroup>
+				<optgroup label="Keyboards">
+					<option value="acoustic_grand_piano">Acoustic Grand Piano</option>
+					<option value="electric_piano_1">Electric Piano 1</option>
+					<option value="electric_piano_2">Electric Piano 2</option>
+					<option value="harpsichord">Harpsichord</option>
+					<option value="accordion">Accordion</option>
+				</optgroup>
+				<optgroup label="Guitars">
+					<option value="electric_guitar_clean">Electric Guitar (Clean)</option>
+					<option value="electric_guitar_jazz">Electric Guitar (Jazz)</option>
+					<option value="distortion_guitar">Distortion Guitar</option>
+					<option value="acoustic_guitar_steel">Acoustic Guitar (Steel)</option>
+					<option value="acoustic_guitar_nylon">Acoustic Guitar (Nylon)</option>
+				</optgroup>
+				<optgroup label="Strings">
+					<option value="violin">Violin</option>
+					<option value="cello">Cello</option>
+					<option value="contrabass">Contrabass</option>
+					<option value="tremolo_strings">Tremolo Strings</option>
+					<option value="orchestral_harp">Orchestral Harp</option>
+				</optgroup>
+				<optgroup label="Winds">
+					<option value="flute">Flute</option>
+					<option value="oboe">Oboe</option>
+					<option value="clarinet">Clarinet</option>
+					<option value="bassoon">Bassoon</option>
+					<option value="piccolo">Piccolo</option>
+					<option value="english_horn">English Horn</option>
+				</optgroup>
+				<optgroup label="Brass">
+					<option value="trumpet">Trumpet</option>
+					<option value="trombone">Trombone</option>
+					<option value="french_horn">French Horn</option>
+					<option value="tuba">Tuba</option>
+					<option value="muted_trumpet">Muted Trumpet</option>
+				</optgroup>
+				<optgroup label="Percussion">
+					<option value="timpani">Timpani</option>
+					<option value="xylophone">Xylophone</option>
+					<option value="steel_drums">Steel Drums</option>
+					<option value="synth_drum">Synth Drum</option>
+					<option value="marimba">Marimba</option>
+					<option value="glockenspiel">Glockenspiel</option>
+				</optgroup>
+				<optgroup label="Synthesizers">
+					<option value="synth_brass_1">Synth Brass 1</option>
+					<option value="synth_strings_1">Synth Strings 1</option>
+					<option value="lead_1_square">Lead 1 (Square)</option>
+					<option value="lead_2_sawtooth">Lead 2 (Sawtooth)</option>
+					<option value="pad_1_new_age">Pad 1 (New Age)</option>
+					<option value="pad_4_choir">Pad 4 (Choir)</option>
+				</optgroup>
+				<optgroup label="Chorus & Effects">
+					<option value="voice_oohs">Voice Oohs</option>
+					<option value="choir_aahs">Choir Aahs</option>
+					<option value="fx_1_rain">FX 1 (Rain)</option>
+					<option value="fx_2_soundtrack">FX 2 (Soundtrack)</option>
+					<option value="fx_5_brightness">FX 5 (Brightness)</option>
+					<option value="fx_7_echoes">FX 7 (Echoes)</option>
+				</optgroup>
+				<optgroup label="Ethnic">
+					<option value="sitar">Sitar</option>
+					<option value="banjo">Banjo</option>
+					<option value="shakuhachi">Shakuhachi</option>
+					<option value="bagpipe">Bagpipe</option>
+					<option value="koto">Koto</option>
+					<option value="kalimba">Kalimba</option>
+				</optgroup>
+			</select>
+
+			<button onclick="playTune(4)">Play Tune 4</button>
+			
+			<br />
+			<br />
+
+			<button onclick="playAllTunes()">Play All Tunes Together</button>
+
+			<button onclick="generateShareLink()">Share Link</button>
+		</div>
+	
+		<div>
+			<h3 style="color: #2c3e50; font-family: 'Arial', sans-serif; border-bottom: 2px solid #3498db; padding-bottom: 5px;">Instructions:</h3>
+			<p style="font-size: 16px; line-height: 1.5;">Enter notes in the textarea input. Each note is defined using the following format:</p>
+			<ul style="margin-left: 20px; font-size: 16px;">
+				<li><strong>Note:</strong> A letter from <strong>A</strong> to <strong>G</strong> representing the musical note.</li>
+				<li><strong>Sharp (#):</strong> (Optional) Add '#' for a sharp note (e.g., <code>C#4</code>).</li>
+				<li><strong>Octave:</strong> A number from <strong>0</strong> to <strong>8</strong> representing the octave of the note.</li>
+				<li><strong>Duration:</strong> A number representing the duration of the note in seconds.</li>
+			</ul>
+			<p style="font-size: 16px;">Separate each note and duration pair with a comma. For example:</p>
+			<p style="background-color: #ecf0f1; padding: 10px; border-radius: 5px; font-family: monospace;"><code>C4:1, D4:0.5, REST:0.5, E4:1</code></p>
+			<p style="font-size: 16px;"><strong>REST:</strong> Use "REST" to indicate a pause. Specify its duration in seconds (e.g., <code>REST:1</code>).</p>
+			<h4 style="color: #34495e; font-family: 'Arial', sans-serif;">Examples:</h4>
+			<ul style="margin-left: 20px; font-size: 16px;">
+				<li><code>C4:1</code> – Play the note C in the 4th octave for 1 second.</li>
+				<li><code>D#5:0.5</code> – Play the sharp D note in the 5th octave for 0.5 seconds.</li>
+				<li><code>REST:2</code> – Add a 2-second pause.</li>
+				<li><code>G3:0.5, A3:1</code> – Play G in the 3rd octave for 0.5 seconds, followed by A in the 3rd octave for 1 second.</li>
+			</ul>
+			<p style="font-size: 16px;">Select the sound type or instrument from the dropdown menu before playing the tune.</p>
+			<p style="font-size: 16px;">Click <strong>"Play Tune"</strong> to hear your composition or <strong>"Play All Tunes Together"</strong> to combine all inputs.</p>
+		</div>
+
+		<div style="margin-top: 30px;">
+			<h3 style="color: #2c3e50; font-family: 'Arial', sans-serif; border-bottom: 2px solid #e67e22; padding-bottom: 5px;">About</h3>
+			<p style="font-size: 16px; line-height: 1.5;">
+				This tool is a polyphonic tune generator designed to help you create and play musical compositions using a variety of instruments and sounds. Whether you're experimenting with melodies or just having fun with sound design, this platform offers an easy and interactive way to bring your ideas to life.
+			</p>
+			<p style="font-size: 16px;">
+				© 2024 <a style="text-decoration: none; color: #3498db;" href="https://www.instagram.com/creatioexnihil00/" target="_blank">creatioexnihil00</a>
+			</p>
+			<p style="font-size: 16px; color: #2c3e50;">
+				Love what you see? ☕ Fuel my creativity by buying me a coffee! Every sip counts!
+			</p>
+			<a href="https://www.buymeacoffee.com/creatioexnihilo" target="_blank">
+				<button class="buy-coffee-button" style="background-color: #e67e22; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer;">☕ Buy Me a Coffee</button>
+			</a>
+		</div>
+
+
+
+    <script>
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        const notesFrequency = {
+            C0: 16.35,  C1: 32.70,  C2: 65.41,  C3: 130.81,  C4: 261.63,  C5: 523.25,  C6: 1046.50,  C7: 2093.00,  C8: 4186.01,
+            "C#0": 17.32, "C#1": 34.65, "C#2": 69.30, "C#3": 138.59, "C#4": 277.18, "C#5": 554.37, "C#6": 1108.73, "C#7": 2217.46, "C#8": 4434.92,
+            D0: 18.35,  D1: 36.71,  D2: 73.42,  D3: 146.83,  D4: 293.66,  D5: 587.33,  D6: 1174.66,  D7: 2349.32,  D8: 4698.64,
+            "D#0": 19.45, "D#1": 38.89, "D#2": 77.78, "D#3": 155.56, "D#4": 311.13, "D#5": 622.25, "D#6": 1244.51, "D#7": 2489.02, "D#8": 4978.03,
+            E0: 20.60,  E1: 41.20,  E2: 82.41,  E3: 164.81,  E4: 329.63,  E5: 659.25,  E6: 1318.51,  E7: 2637.02,  E8: 5274.04,
+            F0: 21.83,  F1: 43.65,  F2: 87.31,  F3: 174.61,  F4: 349.23,  F5: 698.46,  F6: 1396.91,  F7: 2793.83,  F8: 5587.65,
+            "F#0": 23.12, "F#1": 46.25, "F#2": 92.50, "F#3": 185.00, "F#4": 369.99, "F#5": 739.99, "F#6": 1479.98, "F#7": 2959.96, "F#8": 5919.91,
+            G0: 24.50,  G1: 49.00,  G2: 98.00,  G3: 196.00,  G4: 392.00,  G5: 783.99,  G6: 1567.98,  G7: 3135.96,  G8: 6271.93,
+            "G#0": 25.96, "G#1": 51.91, "G#2": 103.83, "G#3": 207.65, "G#4": 415.30, "G#5": 830.61, "G#6": 1661.22, "G#7": 3322.44, "G#8": 6644.88,
+            A0: 27.50,  A1: 55.00,  A2: 110.00,  A3: 220.00,  A4: 440.00,  A5: 880.00,  A6: 1760.00,  A7: 3520.00,  A8: 7040.00,
+            "A#0": 29.14, "A#1": 58.27, "A#2": 116.54, "A#3": 233.08, "A#4": 466.16, "A#5": 932.33, "A#6": 1864.66, "A#7": 3729.31, "A#8": 7458.62,
+            B0: 30.87,  B1: 61.74,  B2: 123.47,  B3: 246.94,  B4: 493.88,  B5: 987.77,  B6: 1975.53,  B7: 3951.07,  B8: 7902.13
+        };
+
+		// Function to play a single tune
+		function playTune(index) {
+			const input = document.getElementById(`tune-input-${index}`).value.trim();
+			const soundType = document.getElementById(`sound-type-${index}`).value;
+
+			if (!input) {
+				alert(`Please enter a tune in Input ${index}.`);
+				return;
+			}
+
+			const tune = parseTuneInput(input);
+
+			if (["sine", "square", "triangle", "sawtooth"].includes(soundType)) {
+				// Play with oscillator waveform
+				playTuneWithOscillator(tune, soundType);
+			} else {
+				// Play with Soundfont.js instrument
+				playTuneWithInstrument(tune, soundType);
+			}
+		}
+
+		// Play tune using oscillator waveforms
+		function playTuneWithOscillator(tune, waveform) {
+			let currentTime = audioContext.currentTime;
+
+			tune.forEach(({ note, duration }) => {
+				if (note === "REST") {
+					currentTime += duration;
+				} else {
+					const frequency = notesFrequency[note];
+					playOscillatorTone(frequency, duration, waveform, currentTime);
+					currentTime += duration;
+				}
+			});
+		}
+
+		function playOscillatorTone(frequency, duration, type, startTime) {
+			const oscillator = audioContext.createOscillator();
+			const gainNode = audioContext.createGain();
+
+			// Connect nodes
+			oscillator.connect(gainNode);
+			gainNode.connect(audioContext.destination);
+
+			// Set properties
+			oscillator.frequency.value = frequency;
+			oscillator.type = type;
+			gainNode.gain.setValueAtTime(0.5, startTime);
+
+			// Start and stop the oscillator
+			oscillator.start(startTime);
+			oscillator.stop(startTime + duration);
+		}
+
+		// Play tune using Soundfont.js instrument
+		function playTuneWithInstrument(tune, instrumentName) {
+			Soundfont.instrument(audioContext, instrumentName).then(function (instrument) {
+				let currentTime = audioContext.currentTime;
+
+				tune.forEach(({ note, duration }) => {
+					if (note !== "REST") {
+						instrument.play(note, currentTime, { duration });
+					}
+					currentTime += duration;
+				});
+			});
+		}
+
+		// Parse input string into a tune array
+		function parseTuneInput(input) {
+			const commands = input.split(",").map(cmd => cmd.trim());
+			const tune = [];
+
+			commands.forEach(command => {
+				const [note, duration] = command.split(":");
+				if (note && duration) {
+					tune.push({ note, duration: parseFloat(duration) });
+				}
+			});
+
+			return tune;
+		}
+
+		// Function to play all tunes simultaneously
+		function playAllTunes() {
+			const inputs = [
+				{ input: document.getElementById('tune-input-1').value.trim(), soundType: document.getElementById('sound-type-1').value },
+				{ input: document.getElementById('tune-input-2').value.trim(), soundType: document.getElementById('sound-type-2').value },
+				{ input: document.getElementById('tune-input-3').value.trim(), soundType: document.getElementById('sound-type-3').value },
+				{ input: document.getElementById('tune-input-4').value.trim(), soundType: document.getElementById('sound-type-4').value }
+			];
+
+			inputs.forEach(({ input, soundType }, index) => {
+				if (!input) {
+					console.warn(`Tune input ${index + 1} is empty. Skipping playback.`);
+					return;
+				}
+
+				const tune = parseTuneInput(input);
+
+				if (["sine", "square", "triangle", "sawtooth"].includes(soundType)) {
+					// Play with oscillator waveform
+					playTuneWithOscillator(tune, soundType);
+				} else {
+					// Play with Soundfont.js instrument
+					playTuneWithInstrument(tune, soundType);
+				}
+			});
+		}
+		
+		
+		
+
+
+		// Generate a shareable encrypted link
+		function generateShareLink() {
+			const inputs = [];
+			for (let i = 1; i <= 4; i++) {
+				inputs.push({
+					tune: document.getElementById(`tune-input-${i}`).value.trim(),
+					sound: document.getElementById(`sound-type-${i}`).value
+				});
+			}
+
+			// Compress and encode the data
+			const dataString = JSON.stringify(inputs);
+			const compressed = LZString.compressToEncodedURIComponent(dataString);
+
+			// Generate the shareable URL
+			const shareURL = `${window.location.origin}${window.location.pathname}?data=${compressed}`;
+			navigator.clipboard.writeText(shareURL).then(() => {
+				alert("Encrypted shareable link copied to clipboard!");
+			}).catch(err => {
+				console.error("Failed to copy share link:", err);
+				alert("Failed to copy share link.");
+			});
+		}
+
+
+		// Populate fields from an encrypted URL
+		function populateFromURL() {
+			const params = new URLSearchParams(window.location.search);
+			const compressedData = params.get("data");
+
+			if (compressedData) {
+				try {
+					// Decode and decompress the data
+					const decompressed = LZString.decompressFromEncodedURIComponent(compressedData);
+					const inputs = JSON.parse(decompressed);
+
+					inputs.forEach((input, index) => {
+						document.getElementById(`tune-input-${index + 1}`).value = input.tune || "";
+						document.getElementById(`sound-type-${index + 1}`).value = input.sound || "";
+					});
+				} catch (err) {
+					console.error("Failed to parse shared data:", err);
+					alert("Invalid or corrupted share link.");
+				}
+			}
+		}
+		populateFromURL(); // Populate fields on page load
+    </script>
+</body>
+</html>
